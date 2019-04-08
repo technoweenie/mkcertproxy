@@ -32,9 +32,9 @@ func main() {
 	}
 
 	if len(cfg.Domain) > 0 {
-		log.Printf("LISTEN        https://%s%s", cfg.Domain, cfg.ListenAddr)
+		log.Printf("LISTEN        https://%s:%d", cfg.Domain, cfg.ListenPort)
 	} else {
-		log.Printf("LISTEN        %s", cfg.ListenAddr)
+		log.Printf("LISTEN        %s", cfg.ListenPort)
 	}
 
 	log.Printf("REVERSE PROXY %s", cfg.ProxyAddr)

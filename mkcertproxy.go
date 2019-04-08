@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -51,8 +52,8 @@ type Config struct {
 	// KeyFile specifies the relative file path to the server's private key.
 	KeyFile string
 
-	// ListenAddr
-	ListenAddr string
+	// ListenPort specifies the local port the reverse proxy server listens on.
+	ListenPort int
 
 	// ProxyAddr specifies the scheme, host, and path of the reverse proxy's
 	// target. The default scheme is "http://".
@@ -77,7 +78,11 @@ func (cfg *Config) SetHostAndListenAddr(certdir, listen string) error {
 		return err
 	}
 
-	cfg.ListenAddr = ":" + port
+	num, err := strconv.Atoi(port)
+	if err != nil {
+		return err
+	}
+	cfg.ListenPort = num
 	if len(host) == 0 {
 		return nil
 	}
@@ -156,7 +161,7 @@ func New(cfg *Config) (*Server, error) {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	return &Server{
 		Server: &http.Server{
-			Addr:    cfg.ListenAddr,
+			Addr:    fmt.Sprintf(":%d", cfg.ListenPort),
 			Handler: proxy,
 			TLSConfig: &tls.Config{
 				Certificates: []tls.Certificate{cert},
